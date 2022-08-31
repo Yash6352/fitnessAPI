@@ -141,6 +141,11 @@ async def login(User: Login = Body(...)):
             "name": users["Name"],
         }
     if users:
+        if users['Status']=='Inactive':
+            return{
+                "code": 401,
+                "message":"You are not verified! Contact Administration"
+            }
         if verify_password(user["PassWords"], users["PassWord"]):
             access_token = create_access_token(
                 data={"sub": users["Email"]},
@@ -152,11 +157,6 @@ async def login(User: Login = Body(...)):
                 "token_type": "bearer",
                 "_id": str(users["_id"]),
                 "name": users["Name"],
-            }
-        elif users['Status']=='Inactive':
-            return{
-                "code": 401,
-                "message":"You are not verified! Contact Administration"
             }
         else:
             return {"code": 404, "message": "Password not match"}
